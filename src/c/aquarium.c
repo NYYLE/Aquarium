@@ -88,8 +88,7 @@ static time_t s_last_feed_time = 0;
 
 static GBitmap *s_fish_bmp[2][3][2];   // [species][size][facing]
 static GBitmap *s_plant_bmp[2];
-static GBitmap *s_rock_bmp;
-static GBitmap *s_octo_bmp[2];
+static GBitmap *s_octo_bmp[2];         // rock is drawn in code, not a resource
 
 static bool s_octo_active = false;
 static int  s_octo_x;            // sub-pixel, travels left -> right
@@ -213,27 +212,24 @@ static void persist_load(void) {
 // each fish locks onto its own pellet so they don't all swarm the same one
 static void assign_target(int fi) {
   Fish *f = &s_fish[fi];
-  if (f->target >= 0 && s_pellets[f->target].active) return;
+  if (f->target >= 0 && s_pellets[f->target].active) return;  // commit until eaten
   f->target = -1;
 
-  int cx, cy; fish_center(f, &cx, &cy);
-  long best_free = -1, best_free_i = -1;
-  long best_any = -1, best_any_i = -1;
-
+  // collect pellets, preferring ones no other fish has claimed
+  int freep[MAX_PELLETS], freen = 0;
+  int anyp[MAX_PELLETS], anyn = 0;
   for (int j = 0; j < MAX_PELLETS; j++) {
     if (!s_pellets[j].active) continue;
-    long dx = s_pellets[j].x - cx, dy = s_pellets[j].y - cy;
-    long d = dx * dx + dy * dy;
-
+    anyp[anyn++] = j;
     bool taken = false;
     for (int k = 0; k < MAX_FISH; k++) {
       if (k != fi && s_fish[k].alive && s_fish[k].target == j) { taken = true; break; }
     }
-    if (best_any_i < 0 || d < best_any) { best_any = d; best_any_i = j; }
-    if (!taken && (best_free_i < 0 || d < best_free)) { best_free = d; best_free_i = j; }
+    if (!taken) freep[freen++] = j;
   }
-  // prefer an unclaimed pellet; fall back to nearest if fish outnumber food
-  f->target = (best_free_i >= 0) ? best_free_i : best_any_i;
+  // pick a *random* pellet (not the nearest) so the fish spread out
+  if (freen > 0)      f->target = freep[rnd(freen)];
+  else if (anyn > 0)  f->target = anyp[rnd(anyn)];
 }
 
 static void step_pellets(void) {
@@ -389,6 +385,30 @@ static void draw_sand(GContext *ctx, int w, int h) {
   }
 }
 
+static void draw_rock_shape(GContext *ctx) {
+  int cx = s_rock_x + s_rock_w / 2;
+  int by = s_rock_y + s_rock_h;        // base rests on the sand
+#if defined(PBL_COLOR)
+  graphics_context_set_fill_color(ctx, GColorFromRGB(52, 50, 64));   // outline
+  graphics_fill_circle(ctx, GPoint(cx - 13, by - 13), 17);
+  graphics_fill_circle(ctx, GPoint(cx + 13, by - 11), 16);
+  graphics_fill_circle(ctx, GPoint(cx, by - 22), 18);
+  graphics_context_set_fill_color(ctx, GColorFromRGB(102, 100, 116)); // body
+  graphics_fill_circle(ctx, GPoint(cx - 13, by - 13), 14);
+  graphics_fill_circle(ctx, GPoint(cx + 13, by - 11), 13);
+  graphics_fill_circle(ctx, GPoint(cx, by - 22), 15);
+  graphics_context_set_fill_color(ctx, GColorFromRGB(165, 163, 180)); // gloss
+  graphics_fill_circle(ctx, GPoint(cx - 7, by - 26), 4);
+#else
+  graphics_context_set_fill_color(ctx, GColorBlack);
+  graphics_fill_circle(ctx, GPoint(cx - 13, by - 13), 15);
+  graphics_fill_circle(ctx, GPoint(cx + 13, by - 11), 14);
+  graphics_fill_circle(ctx, GPoint(cx, by - 22), 16);
+  graphics_context_set_fill_color(ctx, GColorWhite);                  // glint
+  graphics_fill_circle(ctx, GPoint(cx - 7, by - 25), 2);
+#endif
+}
+
 static void canvas_update(Layer *layer, GContext *ctx) {
   GRect b = layer_get_bounds(layer);
   int w = b.size.w, h = b.size.h;
@@ -426,8 +446,8 @@ static void canvas_update(Layer *layer, GContext *ctx) {
     graphics_draw_bitmap_in_rect(ctx, bmp, GRect(s_fish[i].x / SUB, s_fish[i].y / SUB, fs.w, fs.h));
   }
 
-  // rock
-  graphics_draw_bitmap_in_rect(ctx, s_rock_bmp, GRect(s_rock_x, s_rock_y, s_rock_w, s_rock_h));
+  // rock (drawn in code so it never depends on a resource importing)
+  draw_rock_shape(ctx);
 
   // easter egg: octopus floating past at 23:09 (bobs gently as it drifts)
   if (s_octo_active) {
@@ -537,7 +557,6 @@ static void load_bitmaps(void) {
   s_fish_bmp[1][2][1] = gbitmap_create_with_resource(RESOURCE_ID_FISH_B_BIG_R);
   s_plant_bmp[0] = gbitmap_create_with_resource(RESOURCE_ID_PLANT_1);
   s_plant_bmp[1] = gbitmap_create_with_resource(RESOURCE_ID_PLANT_2);
-  s_rock_bmp = gbitmap_create_with_resource(RESOURCE_ID_ROCK);
   s_octo_bmp[0] = gbitmap_create_with_resource(RESOURCE_ID_OCTOPUS_F0);
   s_octo_bmp[1] = gbitmap_create_with_resource(RESOURCE_ID_OCTOPUS_F1);
 }
@@ -549,7 +568,6 @@ static void destroy_bitmaps(void) {
         gbitmap_destroy(s_fish_bmp[s][z][d]);
   gbitmap_destroy(s_plant_bmp[0]);
   gbitmap_destroy(s_plant_bmp[1]);
-  gbitmap_destroy(s_rock_bmp);
   gbitmap_destroy(s_octo_bmp[0]);
   gbitmap_destroy(s_octo_bmp[1]);
 }
@@ -563,8 +581,7 @@ static void window_load(Window *window) {
 
   load_bitmaps();
 
-  GSize rs = gbitmap_get_bounds(s_rock_bmp).size;
-  s_rock_w = rs.w; s_rock_h = rs.h;
+  s_rock_w = 52; s_rock_h = 40;        // code-drawn rock footprint
   s_rock_x = (w - s_rock_w) / 2;
   s_rock_y = s_sand_top - s_rock_h + 14;
 

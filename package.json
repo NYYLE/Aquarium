@@ -31,7 +31,6 @@
         { "type": "bitmap", "name": "FISH_B_BIG_L",  "file": "images/fish_b_big_l.png" },
         { "type": "bitmap", "name": "PLANT_1",       "file": "images/plant_1.png" },
         { "type": "bitmap", "name": "PLANT_2",       "file": "images/plant_2.png" },
-        { "type": "bitmap", "name": "ROCK",          "file": "images/rock.png" },
         { "type": "bitmap", "name": "OCTOPUS_F0",     "file": "images/octopus_f0.png" },
         { "type": "bitmap", "name": "OCTOPUS_F1",     "file": "images/octopus_f1.png" }
       ]
