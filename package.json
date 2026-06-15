@@ -1,0 +1,40 @@
+{
+  "name": "aquarium",
+  "author": "npkelk",
+  "version": "1.0.0",
+  "keywords": ["pebble-app"],
+  "private": true,
+  "dependencies": {},
+  "pebble": {
+    "displayName": "Aquarium",
+    "uuid": "3713e095-6757-4d2e-bdfb-3c5bca416934",
+    "sdkVersion": "3",
+    "enableMultiJS": false,
+    "targetPlatforms": ["aplite", "basalt", "chalk", "diorite", "emery"],
+    "watchapp": {
+      "watchface": true
+    },
+    "messageKeys": [],
+    "resources": {
+      "media": [
+        { "type": "bitmap", "name": "FISH_A_BABY_R", "file": "images/fish_a_baby_r.png" },
+        { "type": "bitmap", "name": "FISH_A_BABY_L", "file": "images/fish_a_baby_l.png" },
+        { "type": "bitmap", "name": "FISH_A_MED_R",  "file": "images/fish_a_med_r.png" },
+        { "type": "bitmap", "name": "FISH_A_MED_L",  "file": "images/fish_a_med_l.png" },
+        { "type": "bitmap", "name": "FISH_A_BIG_R",  "file": "images/fish_a_big_r.png" },
+        { "type": "bitmap", "name": "FISH_A_BIG_L",  "file": "images/fish_a_big_l.png" },
+        { "type": "bitmap", "name": "FISH_B_BABY_R", "file": "images/fish_b_baby_r.png" },
+        { "type": "bitmap", "name": "FISH_B_BABY_L", "file": "images/fish_b_baby_l.png" },
+        { "type": "bitmap", "name": "FISH_B_MED_R",  "file": "images/fish_b_med_r.png" },
+        { "type": "bitmap", "name": "FISH_B_MED_L",  "file": "images/fish_b_med_l.png" },
+        { "type": "bitmap", "name": "FISH_B_BIG_R",  "file": "images/fish_b_big_r.png" },
+        { "type": "bitmap", "name": "FISH_B_BIG_L",  "file": "images/fish_b_big_l.png" },
+        { "type": "bitmap", "name": "PLANT_1",       "file": "images/plant_1.png" },
+        { "type": "bitmap", "name": "PLANT_2",       "file": "images/plant_2.png" },
+        { "type": "bitmap", "name": "ROCK",          "file": "images/rock.png" },
+        { "type": "bitmap", "name": "OCTOPUS_F0",     "file": "images/octopus_f0.png" },
+        { "type": "bitmap", "name": "OCTOPUS_F1",     "file": "images/octopus_f1.png" }
+      ]
+    }
+  }
+}
