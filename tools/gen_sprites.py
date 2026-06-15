@@ -91,24 +91,29 @@ def draw_plant(w, h, blades, mono):
 def draw_rock(w, h, mono):
     img = Image.new("RGBA", (w, h), CLEAR)
     d = ImageDraw.Draw(img)
-    base = BLACK if mono else (112, 110, 122, 255)
-    hi = WHITE if mono else (168, 166, 182, 255)
-    sh = BLACK if mono else (70, 68, 80, 255)
+    base = BLACK if mono else (96, 94, 110, 255)
+    hi = WHITE if mono else (160, 158, 176, 255)
+    sh = BLACK if mono else (52, 50, 64, 255)
 
     def box(a, b, c, e):
         return [int(a), int(b), int(c), int(e)]
 
-    # lumpy mass from a few overlapping ellipses
-    d.ellipse(box(2, h * 0.35, w - 3, h - 1), fill=base)
-    d.ellipse(box(w * 0.08, h * 0.18, w * 0.66, h - 1), fill=base)
-    d.ellipse(box(w * 0.42, h * 0.30, w - 3, h - 1), fill=base)
+    # dark outline silhouette (slightly larger) for contrast against the water
     if not mono:
-        d.ellipse(box(2, h * 0.62, w - 3, h - 1), fill=sh)          # base shadow
-        d.ellipse(box(w * 0.1, h * 0.18, w * 0.6, h * 0.72), fill=base)
-        d.ellipse(box(w * 0.2, h * 0.24, w * 0.33, h * 0.38), fill=hi)  # gloss
-        d.ellipse(box(w * 0.52, h * 0.34, w * 0.62, h * 0.46), fill=hi)
+        d.ellipse(box(0, h * 0.28, w - 1, h - 1), fill=sh)
+        d.ellipse(box(w * 0.04, h * 0.10, w * 0.66, h - 1), fill=sh)
+        d.ellipse(box(w * 0.40, h * 0.22, w - 1, h - 1), fill=sh)
+
+    # base mass (inset so the outline shows)
+    d.ellipse(box(2, h * 0.32, w - 3, h - 2), fill=base)
+    d.ellipse(box(w * 0.07, h * 0.14, w * 0.64, h - 2), fill=base)
+    d.ellipse(box(w * 0.42, h * 0.26, w - 3, h - 2), fill=base)
+
+    if not mono:
+        d.ellipse(box(w * 0.15, h * 0.20, w * 0.34, h * 0.40), fill=hi)  # gloss
+        d.ellipse(box(w * 0.50, h * 0.28, w * 0.63, h * 0.44), fill=hi)
     else:
-        d.ellipse(box(w * 0.26, h * 0.30, w * 0.33, h * 0.40), fill=WHITE)
+        d.ellipse(box(w * 0.20, h * 0.24, w * 0.31, h * 0.36), fill=WHITE)
     return img
 
 
@@ -170,8 +175,8 @@ def main():
         save({"color": draw_plant(w, h, blades, mono=False),
               "bw": draw_plant(w, h, blades, mono=True)}, name)
 
-    save({"color": draw_rock(44, 34, mono=False),
-          "bw": draw_rock(44, 34, mono=True)}, "rock")
+    save({"color": draw_rock(58, 46, mono=False),
+          "bw": draw_rock(58, 46, mono=True)}, "rock")
 
     for frame in (0, 1):
         save({"color": draw_octopus(frame, mono=False),

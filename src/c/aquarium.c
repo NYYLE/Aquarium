@@ -283,7 +283,7 @@ static void step_fish(void) {
       // swim to the rock and tuck in behind it
       f->hide_timer--;
       int hx = (s_rock_x + s_rock_w / 2) * SUB;
-      int hy = (s_rock_y + s_rock_h / 2) * SUB;
+      int hy = (s_rock_y + s_rock_h / 3) * SUB;  // upper mass: reachable + covered
       int dx = hx - cx, dy = hy - cy;
       f->vx = (dx / 8 > 12) ? 12 : (dx / 8 < -12 ? -12 : dx / 8);
       f->vy = (dy / 8 > 10) ? 10 : (dy / 8 < -10 ? -10 : dy / 8);
@@ -295,7 +295,7 @@ static void step_fish(void) {
       if (f->vx < -SPEED) f->vx = -SPEED;
       if (f->vy > SPEED / 2) f->vy = SPEED / 2;
       if (f->vy < -SPEED / 2) f->vy = -SPEED / 2;
-      if (rnd(800) < 2) f->hide_timer = 90 + rnd(120);  // ~7-17s hideout
+      if (rnd(450) < 2) f->hide_timer = 70 + rnd(90);  // ~6-13s hideout
     }
 
     f->x += f->vx;
@@ -565,8 +565,8 @@ static void window_load(Window *window) {
 
   GSize rs = gbitmap_get_bounds(s_rock_bmp).size;
   s_rock_w = rs.w; s_rock_h = rs.h;
-  s_rock_x = (w - s_rock_w) / 2 + 6;
-  s_rock_y = s_sand_top - s_rock_h + 12;
+  s_rock_x = (w - s_rock_w) / 2;
+  s_rock_y = s_sand_top - s_rock_h + 14;
 
   GSize os = gbitmap_get_bounds(s_octo_bmp[0]).size;
   s_octo_w = os.w; s_octo_h = os.h;
